@@ -1,7 +1,9 @@
 # Todo web app
 
-Web application is running on GAE and using Datastore as a database
-To run application locally you will need a credentials file ( which is not in GIT)
+Web application is running on GAE and using Datastore as a database.
+
+To run application locally you will need a credentials file ( which is not in GIT).
+
 Application link on GAE: https://todo-project-1537205581143.ew.r.appspot.com/
  
 ### Local running:
