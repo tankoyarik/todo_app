@@ -13,11 +13,7 @@ from utils.db_helper import (
 from utils.validators import Todo
 
 app = Flask(__name__)
-#
-from google.cloud import datastore
 
-# #
-import os
 from datetime import datetime
 
 
@@ -45,7 +41,7 @@ def removeTodo(item_id):
     if not check_todo_exist(item_id):
         return jsonify("Doesn't exist"), 404
     delete_todo(item_id)
-    return jsonify('Item removed'), 204
+    return jsonify("Item removed"), 204
 
 
 # endpoint for updating todo item
