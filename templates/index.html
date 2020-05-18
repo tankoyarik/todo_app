@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+
+
+
+    <title>Todo</title>
+</head>
+<body>
+<section class="todoapp">
+    <header class="header">
+        <h1>Todos</h1>
+    </header>
+
+    <section class="main">
+        {% if todos %}
+            <ul class="list-group">
+                {% for index, todo in todos %}
+                    <li class="list-group-item" id={{todo.id}}>
+                        <div class="view">
+{#                            Enabled or disabled checkbox depending on `done` state#}
+                            {% if todo.done %}
+                                <input class="toggle" id="{{todo.id}}checkbox" type="checkbox" onclick="toggleComplete(this)"
+                                    data-completed=0 data-id={{todo.id}} checked>
+                            {% else %}
+                                <input class="toggle" id="{{todo.id}}checkbox" type="checkbox" onclick="toggleComplete(this)"
+                                        data-completed=1 data-id={{todo.id}}>
+                            {% endif %}
+                            <label>{{todo.title}}</label>
+                            <button type="button" class="btn btn-danger" onclick="removeItem({{ todo.id }}, {{ index }})">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a id="addNewTodoLink" onclick="showInput()" href="#" style="color: royalblue"><span class="glyphicon glyphicon-plus"></span>Add todo</a>
+            <div id="inputField" style="display:none;">
+                <div class="form-group" >
+                    <label for="message" class="h4 ">Title</label>
+                    <input class="form-control" id="InputNewTodo" placeholder="Enter your todo title" required>
+                </div>
+                <button type="submit" onclick="addItem()" id="form-submit" class="btn btn-success btn-lg pull-right " >Submit</button>
+                <button type="button" onclick="cancelInput()" class="btn btn-danger">Cancel</button>
+            </div>
+        {% else %}
+            <h1>No todos found</h1>
+        {% endif %}
+    </section>
+
+    <footer class="footer"></footer>
+    <script>
+      // function that makes API call to add an item
+      function addItem(e) {
+        // if enter key is pressed on the form input, add new item
+          let fieldvalue = document.getElementById("InputNewTodo");
+          fetch('/add-todo', {
+            method: 'post',
+            body: JSON.stringify({
+              title: fieldvalue.value,
+              done: false
+            })
+          })
+            .then(response =>
+              response.json()
+            ).then(data => {
+              fieldvalue.value = "";
+              document.getElementById('inputField').style.display = 'none';
+              appendToList(data)
+            })
+
+      }
+
+      // function that makes API call to remove an item
+      function removeItem(id, index) {
+        fetch(`/delete-todo/${id}`, {
+          method: 'delete',
+        });
+        let el = document.getElementById(`${id}`);
+        el.remove();
+      }
+
+      // function that makes API call to update an item
+      // toggles the state of the item between complete and
+      // incomplete states
+      function toggleComplete(elem) {
+        const id = elem.dataset.id;
+        const completed =  Boolean(Number(elem.dataset.completed));
+        fetch(`/update-todo/${id}`, {
+          method: 'patch',
+          body: JSON.stringify({completed})
+        }).then(response => response.json()).then(data=>{
+          if (elem.dataset.completed==='1') {
+          document.getElementById(`${id}checkbox`).setAttribute('data-completed', '0');
+          }
+          else{
+          document.getElementById(`${id}checkbox`).setAttribute('data-completed', '1')
+          }
+        });
+
+
+      }
+
+      // helper function to append new ToDo item to current ToDo list
+      function appendToList(data) {
+        let html = `
+            <li id="${data.id}">
+              <div class="view">
+                <input class="toggle" type="checkbox" onclick="toggleComplete(this)"
+                  data-completed="${data.completed}" data-id="${data.id}">
+                <label>${data.title}</label>
+                <button type="button" class="btn btn-danger" onclick="removeItem('${data.id}')">
+                    <span class="glyphicon glyphicon-trash"></span>
+                </button>
+              </div>
+            </li>`;
+        $(#list-group)
+        let list = document.querySelector(".list-group")
+        list.innerHTML += html;
+      };
+
+      function showInput() {
+        document.getElementById('addNewTodoLink').style.display = 'none';
+        document.getElementById('inputField').style.display = 'block';
+      }
+
+      function cancelInput(){
+        document.getElementById('inputField').style.display = 'none';
+        document.getElementById('addNewTodoLink').style.display = 'block';
+
+      }
+    </script>
+
+</section>
+
+</body>
+
